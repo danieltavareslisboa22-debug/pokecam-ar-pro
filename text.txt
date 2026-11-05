@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt‑BR">
+<head>
+  <meta charset="UTF‑8">
+  <meta name="viewport" content="width=device‑width, initial‑scale=1.0">
+  <title>Mundo das Criaturas</title>
+  <style>
+    * { margin:0; padding:0; box‑sizing:border‑box; font‑family:Arial, sans‑serif; }
+    body { background:#0b0b20; color:#fff; overflow‑x:hidden; }
+
+    /* Abertura cinematográfica */
+    #intro { position:fixed; inset:0; background:#000; z‑index:9999; display:flex; align‑items:center; justify‑content:center; }
+    .cursor‑gold { color:#ffd700; font‑size:2rem; white‑space:pre; }
+    .blink { animation:blink 0.7s infinite; }
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
+    .fade‑out { animation:fadeOut 1.5s forwards; }
+    @keyframes fadeOut { to { opacity:0; pointer‑events:none; } }
+
+    /* Navegação */
+    nav { position:sticky; top:0; background:#141432; padding:1rem; display:flex; gap:1rem; flex‑wrap:wrap; justify‑content:center; }
+    nav button { background:#ffd700; color:#000; border:none; padding:0.6rem 1rem; border‑radius:8px; cursor:pointer; font‑weight:bold; }
+    .secao { display:none; padding:2rem; max‑width:1000px; margin:0 auto; }
+    .ativa { display:block; }
+
+    /* Efeitos especiais */
+    .particulas { position:fixed; inset:0; pointer‑events:none; z‑index:-1; }
+    .card { background:#1a1a40; padding:1rem; border‑radius:12px; margin:1rem 0; box‑shadow:0 0 12px #ffd70044; }
+    img { max‑width:100%; border‑radius:8px; }
+
+    /* Câmera e foto */
+    #cameraBox { margin:1rem 0; }
+    video { max‑width:100%; border:2px solid #ffd700; border‑radius:8px; }
+    #canvas { display:none; }
+    #fotoCapturada { margin:1rem 0; max‑width:100%; border:2px solid #ffd700; border‑radius:8px; }
+    #resultadoNota { font‑size:1.8rem; color:#ffd700; font‑weight:bold; margin:1rem 0; }
+    .botao‑grande { background:#ffd700; color:#000; border:none; padding:1rem 1.5rem; border‑radius:10px; font‑size:1.1rem; font‑weight:bold; cursor:pointer; margin:1rem 0; }
+  </style>
+</head>
+<body>
+  <!-- Abertura -->
+  <div id="intro">
+    <div class="cursor‑gold" id="textoIntro"></div>
+  </div>
+
+  <div class="particulas" id="particulas"></div>
+
+  <nav>
+    <button data‑secao="inicio">Início</button>
+    <button data‑secao="pokedex">Pokédex</button>
+    <button data‑secao="galeria">Galeria</button>
+    <button data‑secao="interagir">📷 Interagir</button>
+    <button data‑secao="perfil">Meu Perfil</button>
+  </nav>
+
+  <div class="secao ativa" id="inicio">
+    <h1>Bem‑vindo ao Mundo das Criaturas ✨</h1>
+    <p>Explore, fotografe e aviste criaturas incríveis ao seu redor!</p>
+    <div class="card">
+      <h3>Como funciona?</h3>
+      <p>Toque no botão <strong>📷 Interagir</strong> lá em cima para abrir a câmera do celular, tire a foto da criatura e receba uma nota!</p>
+    </div>
+  </div>
+
+  <div class="secao" id="pokedex">
+    <h2>📖 Pokédex</h2>
+    <div class="card">
+      <h3>Criatura 01 — Luz Dourada</h3>
+      <p>Brilha ao entardecer</p>
+      <img src="https://via.placeholder.com/400x220/222266/ffd700?text=Criatura+Luz+Dourada" alt="Criatura Luz Dourada">
+    </div>
+    <div class="card">
+      <h3>Criatura 02 — Sombra da Floresta</h3>
+      <p>Se esconde entre as árvores</p>
+      <img src="https://via.placeholder.com/400x220/112244/aaddff?text=Criatura+Sombra+da+Floresta" alt="Criatura Sombra da Floresta">
+    </div>
+    <div class="card">
+      <h3>Criatura 03 — Água Cristal</h3>
+      <p>Vive nas águas calmas</p>
+      <img src="https://via.placeholder.com/400x220/003355/88ddff?text=Criatura+Água+Cristal" alt="Criatura Água Cristal">
+    </div>
+  </div>
+
+  <div class="secao" id="galeria">
+    <h2>🖼️ Galeria</h2>
+    <p>Fotos registradas de criaturas:</p>
+    <div class="card">
+      <img src="https://via.placeholder.com/400x220/202040/ffddaa?text=Foto+registrada+1" alt="Foto de criatura 1">
+      <p>Registro nº 001 — Entardecer</p>
+    </div>
+    <div class="card">
+      <img src="https://via.placeholder.com/400x220/152535/bbddff?text=Foto+registrada+2" alt="Foto de criatura 2">
+      <p>Registro nº 002 — Beira‑rio</p>
+    </div>
+  </div>
+
+  <div class="secao" id="interagir">
+    <h2>📷 Tire sua foto da criatura!</h2>
+    <div id="cameraBox">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <img id="fotoCapturada" alt="Foto tirada">
+    </div>
+    <button id="btnAbrirCam" class="botao‑grande">Abrir câmera</button>
+    <button id="btnTirarFoto" class="botao‑grande" style="display:none;">Tirar foto e avaliar</button>
+    <div id="resultadoNota"></div>
+  </div>
+
+  <div class="secao" id="perfil">
+    <h2>👤 Meu Perfil — Histórico de avaliações</h2>
+    <div id="historico"></div>
+  </div>
+
+  <script>
+    // Abertura com cursor dourado
+    const textoCompleto = "Bem‑vindo ao Mundo das Criaturas...";
+    const elIntro = document.getElementById("textoIntro");
+    let indice = 0;
+    function digitar() {
+      if(indice < textoCompleto.length) {
+        elIntro.textContent += textoCompleto[indice];
+        indice++;
+        setTimeout(digitar, 80);
+      } else {
+        elIntro.innerHTML += '<span class="blink">|</span>';
+        setTimeout(()=>{
+          document.getElementById("intro").classList.add("fade‑out");
+        }, 1800);
+      }
+    }
+    digitar();
+
+    // Navegação entre seções
+    const botoesNav = document.querySelectorAll("nav button");
+    const secoes = document.querySelectorAll(".secao");
+    botoesNav.forEach(botao => {
+      botao.addEventListener("click", ()=>{
+        const alvo = botao.dataset.secao;
+        secoes.forEach(s => s.classList.remove("ativa"));
+        document.getElementById(alvo).classList.add("ativa");
+      });
+    });
+
+    // Câmera, captura de foto e nota aleatória
+    let streamCam = null;
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const fotoCapturada = document.getElementById("fotoCapturada");
+    const btnAbrirCam = document.getElementById("btnAbrirCam");
+    const btnTirarFoto = document.getElementById("btnTirarFoto");
+    const resultadoNota = document.getElementById("resultadoNota");
+    const historico = document.getElementById("historico");
+    let registros = JSON.parse(localStorage.getItem("registrosCriaturas")) || [];
+
+    function atualizarHistorico() {
+      historico.innerHTML = "";
+      registros.forEach((reg, i)=>{
+        historico.innerHTML += `<div class="card">Registro ${i+1} — Nota: ${reg.nota}/100 — Data: ${reg.data}</div>`;
+      });
+    }
+    atualizarHistorico();
+
+    btnAbrirCam.addEventListener("click", async ()=>{
+      try {
+        streamCam = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+        video.srcObject = streamCam;
+        btnAbrirCam.style.display = "none";
+        btnTirarFoto.style.display = "block";
+      } catch(erro) {
+        alert("Não foi possível abrir a câmera: permissão negada ou não disponível.");
+      }
+    });
+
+    btnTirarFoto.addEventListener("click", ()=>{
+      // Salva a foto do vídeo para o site
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+      const imagemUrl = canvas.toDataURL("image/png");
+      fotoCapturada.src = imagemUrl;
+      fotoCapturada.style.display = "block";
+
+      // Nota aleatória de 0 a 100
+      const notaAleatoria = Math.floor(Math.random()*101);
+      resultadoNota.textContent = `⭐ Nota da criatura: ${notaAleatoria}/100`;
+      const agora = new Date().toLocaleString("pt‑BR");
+      registros.push({nota:notaAleatoria, data:agora, imagem:imagemUrl});
+      localStorage.setItem("registrosCriaturas", JSON.stringify(registros));
+      atualizarHistorico();
+    });
+
+    // Partículas simples de fundo
+    const containerParticulas = document.getElementById("particulas");
+    for(let i=0; i<35; i++) {
+      const p = document.createElement("div");
+      p.style.position = "absolute";
+      p.style.width = Math.random()*6+2+"px";
+      p.style.height = p.style.width;
+      p.style.background = "#ffd700";
+      p.style.borderRadius = "50%";
+      p.style.opacity = Math.random()*0.4+0.1;
+      p.style.left = Math.random()*100+"%";
+      p.style.top = Math.random()*100+"%";
+      containerParticulas.appendChild(p);
+    }
+  </script>
+</body>
+</html>
